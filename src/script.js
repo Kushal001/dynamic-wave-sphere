@@ -1,6 +1,9 @@
 import "./style.css"
 import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
+import * as dat from "dat.gui"
+import waveVertexShader from "./shaders/waves/vertex.glsl"
+import waveFragmentShader from "./shaders/waves/fragment.glsl"
 
 /**
  * Base
@@ -11,16 +14,19 @@ const canvas = document.querySelector(".webgl")
 // Scene
 const scene = new THREE.Scene()
 
+// Debug
+const gui = new dat.GUI()
+
 /**
- * Mesh
+ * Wave
  */
-const geometry = new THREE.PlaneGeometry(1, 1)
-const material = new THREE.MeshBasicMaterial({
-  color: 0xffff00,
-  side: THREE.DoubleSide,
+const waveGeometry = new THREE.SphereGeometry(4, 128, 128)
+const waveMaterial = new THREE.ShaderMaterial({
+  vertexShader: waveVertexShader,
+  fragmentShader: waveFragmentShader,
 })
-const plane = new THREE.Mesh(geometry, material)
-scene.add(plane)
+const wave = new THREE.Mesh(waveGeometry, waveMaterial)
+scene.add(wave)
 
 /**
  * Sizes
@@ -54,12 +60,15 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 )
-camera.position.set(0, 0, 1)
+camera.position.set(0, 0, 9)
 scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
+
+// Debug
+gui.add(camera.position, "z").min(0).max(15).step(1).name("zCameraPosition")
 
 /**
  * Axes helper
